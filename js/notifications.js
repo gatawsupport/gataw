@@ -19,27 +19,31 @@ const VAPID_KEY = 'BGfXhraSo7Sp8_jc-v7cJLsHTT0_aTpTu3TLygrGm-oh4lY6pxsAohqPhZW44
 
 // ── SERVICE WORKER PATH HELPER ────────────────────────────────────────────────
 /**
- * Detects the correct path to firebase-messaging-sw.js regardless of
- * whether the site is on localhost, GitHub Pages, or a custom domain.
+ * Detects the correct path AND scope for firebase-messaging-sw.js.
+ * Works on localhost, GitHub Pages, and custom domains.
+ * Scope is explicitly set to fix Android Chrome's stricter SW scope enforcement.
  *
- * - localhost / custom domain → /firebase-messaging-sw.js
- * - GitHub Pages subfolder   → /your-repo-name/firebase-messaging-sw.js
+ * Returns: { swPath, swScope }
  */
-function _getServiceWorkerPath() {
+function _getServiceWorkerConfig() {
   const isGitHubPages = window.location.hostname.endsWith('github.io');
 
   if (isGitHubPages) {
-    // GitHub Pages: site is at /repo-name/ so we need that prefix
+    // GitHub Pages: site lives at /repo-name/
+    // Service worker must be registered with matching scope
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     const repoName  = pathParts[0] || '';
     const swPath    = `/${repoName}/firebase-messaging-sw.js`;
-    console.log('[Notifications] GitHub Pages detected. SW path:', swPath);
-    return swPath;
+    const swScope   = `/${repoName}/`;
+    console.log('[Notifications] GitHub Pages detected.');
+    console.log('[Notifications] SW path:', swPath);
+    console.log('[Notifications] SW scope:', swScope);
+    return { swPath, swScope };
   }
 
   // localhost or custom domain — service worker is at root
   console.log('[Notifications] Standard host detected. SW path: /firebase-messaging-sw.js');
-  return '/firebase-messaging-sw.js';
+  return { swPath: '/firebase-messaging-sw.js', swScope: '/' };
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -73,10 +77,11 @@ async function initPushNotifications(uid) {
 
     console.log('[Notifications] Initializing push notifications for uid:', uid);
 
-    // Register the service worker using the auto-detected path
-    const swPath = _getServiceWorkerPath();
-    const registration = await navigator.serviceWorker.register(swPath);
+    // Register the service worker with explicit scope for Android Chrome compatibility
+    const { swPath, swScope } = _getServiceWorkerConfig();
+    const registration = await navigator.serviceWorker.register(swPath, { scope: swScope });
     console.log('[Notifications] Service worker registered:', registration);
+    console.log('[Notifications] Service worker scope:', registration.scope);
 
     // Initialize Firebase Messaging
     const messaging = firebase.messaging();
