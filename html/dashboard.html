@@ -263,6 +263,10 @@
     </main>
   </div>
 
+<!-- ⚠️ DEBUG ONLY — Remove after mobile testing -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+
 <!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
 
@@ -283,6 +287,9 @@
 
 <!-- 3. Notifications — must be before auth.js -->
 <script src="../js/notifications.js"></script>
+
+<!-- 3b. Push Alerts Watcher -->
+<script src="../js/pushAlerts.js"></script>
 
 <!-- 4. Auth -->
 <script src="../js/auth.js"></script>
