@@ -154,7 +154,7 @@ function _onAlertAddedOrChanged(alert, isUpdate) {
 
   // Build and send
   const { title, body } = _buildAlertPayload(parameter, severity, value, threshold, message, reason);
-  _sendPushToAllTokens(title, body);
+  _sendPushToAllTokens(title, body, parameter);
 }
 
 /**
@@ -178,7 +178,7 @@ function _onAlertRemoved(alert) {
         if (!snap.exists()) {
           console.log(`[PushAlerts] "${parameter}" returned to safe range. Sending recovery push.`);
           const { title, body } = _buildRecoveryPayload(parameter);
-          _sendPushToAllTokens(title, body);
+          _sendPushToAllTokens(title, body, parameter);
         } else {
           console.log(`[PushAlerts] "${parameter}" re-alerted immediately — skipping recovery push.`);
         }
@@ -199,7 +199,7 @@ function _onAlertRemoved(alert) {
  *
  * For full multi-user push, see the server-side note at the bottom of this file.
  */
-async function _sendPushToAllTokens(title, body) {
+async function _sendPushToAllTokens(title, body, parameter = 'general') {
   try {
     // ── Show local foreground toast immediately (works in all cases) ───────
     if (typeof _showToastNotification === 'function') {
@@ -212,12 +212,12 @@ async function _sendPushToAllTokens(title, body) {
       const registration = await navigator.serviceWorker.ready;
       if (registration && Notification.permission === 'granted') {
         await registration.showNotification(title, {
-          body:    body,
-          icon:    '../images/gataw.png',
-          badge:   '../images/gataw.png',
-          tag:     'bangus-pond-alert',
+          body:     body,
+          icon:     '../images/gataw.png',
+          badge:    '../images/gataw.png',
+          tag:      `bangus-pond-${parameter}`, // ← unique per parameter so they don't replace each other
           renotify: true,
-          data:    { url: '/html/alerts.html' },
+          data:     { url: '/html/alerts.html' },
         });
         console.log('[PushAlerts] ✅ System notification shown via service worker.');
       }
