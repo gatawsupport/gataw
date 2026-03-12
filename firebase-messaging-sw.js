@@ -13,13 +13,13 @@
 
   // Firebase config — must match your firebase.js
   firebase.initializeApp({
-  apiKey: "xxxxxx",
-  authDomain: "xxxxx",
-  databaseURL: "xxxxx",
-  projectId: "xxxxxxxxxx",
-  storageBucket: "xxxxx",
-  messagingSenderId: "xxxxxxxxxx",
-  appId: "xxxxxx"
+  apiKey: "AIzaSyBLahiL7WFpeDmoWV3ZlRCg288Shwxw_EE",
+  authDomain: "prototypefishda.firebaseapp.com",
+  databaseURL: "https://prototypefishda-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "prototypefishda",
+  storageBucket: "prototypefishda.appspot.com",
+  messagingSenderId: "452322894750",
+  appId: "1:452322894750:web:4d10904fb4b320c261ac8f"
   });
 
   const messaging = firebase.messaging();
