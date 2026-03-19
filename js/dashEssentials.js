@@ -1,0 +1,188 @@
+// ===========================
+// HAMBURGER / SIDEBAR TOGGLE
+// ===========================
+  function toggleSidebar() {
+    const sidebar  = document.getElementById('sidebar');
+    const overlay  = document.getElementById('sidebarOverlay');
+    const hamburger = document.getElementById('hamburgerBtn');
+
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+    hamburger.classList.toggle('active');
+  }
+
+  // Close sidebar when a nav link is clicked (nice on mobile)
+  document.querySelectorAll('.sidebar ul li a').forEach(link => {
+    link.addEventListener('click', () => {
+      const sidebar  = document.getElementById('sidebar');
+      const overlay  = document.getElementById('sidebarOverlay');
+      const hamburger = document.getElementById('hamburgerBtn');
+      
+      // Only auto-close on mobile
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        hamburger.classList.remove('active');
+      }
+    });
+  });
+
+  // updateBatteryColor is defined in app.js
+
+
+
+  // ===========================
+  // DARK MODE TOGGLE
+  // ===========================
+  function toggleDarkMode() {
+    const toggle         = document.getElementById('darkModeToggle');
+    const modeTransition = document.getElementById('modeTransition');
+
+    modeTransition.classList.add('active');
+
+    setTimeout(() => {
+      if (toggle.checked) {
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      setTimeout(() => modeTransition.classList.remove('active'), 300);
+    }, 100);
+  }
+
+  // ===========================
+  // PROFILE DROPDOWN TOGGLE
+  // ===========================
+  function toggleProfileDropdown() {
+    const trigger = document.getElementById('profileTrigger');
+    const dropdown = document.getElementById('profileDropdown');
+    
+    trigger.classList.toggle('active');
+    dropdown.classList.toggle('show');
+  }
+
+  function closeProfileDropdown() {
+    const trigger = document.getElementById('profileTrigger');
+    const dropdown = document.getElementById('profileDropdown');
+    
+    trigger.classList.remove('active');
+    dropdown.classList.remove('show');
+  }
+
+  // ===========================
+  // INIT
+  // ===========================
+  // ===========================
+  // LOGOUT CONFIRMATION MODAL
+  // ===========================
+  function showLogoutModal() {
+    const modal = document.getElementById('logoutConfirmModal');
+    if (modal) modal.classList.add('show');
+  }
+
+  function hideLogoutModal() {
+    const modal = document.getElementById('logoutConfirmModal');
+    if (modal) modal.classList.remove('show');
+  }
+
+  /**
+   * Returns a Promise<boolean> — true = confirmed, false = cancelled.
+   * auth.js calls window.confirmLogoutModal() instead of native confirm().
+   */
+  function confirmLogoutModal() {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('logoutConfirmModal');
+
+      // No modal in DOM — resolve true so logout still proceeds
+      if (!modal) { resolve(true); return; }
+
+      showLogoutModal();
+
+      function onConfirm() { cleanup(); resolve(true);  }
+      function onCancel()  { cleanup(); resolve(false); }
+      function onBackdrop(e) { if (e.target === modal) { cleanup(); resolve(false); } }
+
+      function cleanup() {
+        hideLogoutModal();
+        document.getElementById('logoutConfirmBtn')?.removeEventListener('click', onConfirm);
+        document.getElementById('logoutCancelBtn')?.removeEventListener('click', onCancel);
+        modal.removeEventListener('click', onBackdrop);
+      }
+
+      document.getElementById('logoutConfirmBtn')?.addEventListener('click', onConfirm);
+      document.getElementById('logoutCancelBtn')?.addEventListener('click', onCancel);
+      modal.addEventListener('click', onBackdrop);
+    });
+  }
+
+  // Expose globally so auth.js (and any other page) can call it
+  window.showLogoutModal    = showLogoutModal;
+  window.hideLogoutModal    = hideLogoutModal;
+  window.confirmLogoutModal = confirmLogoutModal;
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // Restore saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark');
+      const toggle = document.getElementById('darkModeToggle');
+      if (toggle) toggle.checked = true;
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.getElementById('sidebarOverlay').addEventListener('click', function() {
+      toggleSidebar();
+    });
+
+    // Profile dropdown functionality
+    const profileTrigger = document.getElementById('profileTrigger');
+    
+    if (profileTrigger) {
+      profileTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleProfileDropdown();
+      });
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const container = document.querySelector('.profile-dropdown-container');
+      const dropdown = document.getElementById('profileDropdown');
+      
+      if (container && !container.contains(e.target)) {
+        closeProfileDropdown();
+      }
+    });
+
+    // ===========================
+    // LOGOUT BUTTON — intercept here so modal is always available
+    // ===========================
+    document.querySelectorAll('#logoutBtn, [data-action="logout"]').forEach(btn => {
+      btn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (typeof closeProfileDropdown === 'function') closeProfileDropdown();
+
+        // Check if guest (guests skip the modal)
+        let isGuest = false;
+        try {
+          const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+          isGuest = session.isGuest === true;
+        } catch (_) {}
+
+        if (!isGuest) {
+          const confirmed = await confirmLogoutModal();
+          if (!confirmed) return;
+        }
+
+        // Delegate actual sign-out to auth.js
+        if (typeof window.executeLogout === 'function') {
+          window.executeLogout();
+        }
+      });
+    });
+
+  });

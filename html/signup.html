@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - GATAW</title>
+  
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="../css/login.css">
+
+</head>
+<body>
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <h3 id="loadingText">Processing...</h3>
+    </div>
+  </div>
+
+  <div class="login-container">
+    <!-- Logo -->
+<div class="logo-section">
+  <div style="position: relative; display: inline-block; height: 90px; width: 300px;">
+    <div style="
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right,  #0f25cc, #5ad210);
+      -webkit-mask-image: url('../images/gataw.png');
+      mask-image: url('../images/gataw.png');
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+    "></div>
+  </div>
+  <p class="tagline" id="pageTagline">Create Your Account</p>
+</div>
+
+    <!-- Error/Success message -->
+    <div class="error-message" id="errorMessage">
+      <i class="fas fa-exclamation-circle"></i> Error message
+    </div>
+
+    <div class="success-message" id="successMessage">
+      <i class="fas fa-check-circle"></i> Success message
+    </div>
+
+    <!-- STEP 1: Sign Up Form -->
+    <form class="login-form" id="signupForm">
+      <div class="form-group">
+        <label for="signupEmail">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input 
+            type="email" 
+            id="signupEmail" 
+            class="form-control" 
+            placeholder="Enter your email"
+            required
+            autocomplete="email"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signupPassword">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input 
+            type="password" 
+            id="signupPassword" 
+            class="form-control" 
+            placeholder="Create a strong password"
+            required
+            minlength="8"
+            autocomplete="new-password"
+          >
+          <span
+            id="togglePassword"
+            class="password-toggle-text"
+            role="button"
+            tabindex="0"
+            aria-label="Show password"
+          >
+            Show
+          </span>
+        </div>
+        <p class="password-help">
+          <i class="fas fa-info-circle"></i> 
+          Use at least 8 characters with uppercase, lowercase, numbers, and symbols
+        </p>
+      </div>
+
+      <div class="form-group terms-group">
+        <label class="terms-label">
+          <input type="checkbox" id="agreeTerms" class="terms-checkbox">
+          <span>
+            I agree to the 
+            <a href="#" id="openTermsBtn" class="terms-link">Terms and Conditions</a> 
+            and 
+            <a href="#" id="openPrivacyBtn" class="terms-link">Privacy Policy</a>
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-login">
+        <i class="fas fa-user-plus"></i>
+        Create Account
+      </button>
+    </form>
+
+    <!-- STEP 2: Email Verification Step (hidden by default) -->
+    <div id="verificationStep" class="verification-step" style="display: none;">
+      <div class="verification-info">
+        <i class="fas fa-envelope-open-text verification-envelope"></i>
+        <h3>Check Your Email</h3>
+        <p>We've sent a verification link to:</p>
+        <p class="email-display" id="emailDisplay"></p>
+      </div>
+
+      <div class="verification-instructions">
+        <div class="instruction-item">
+          <i class="fas fa-check-circle"></i>
+          <span>Click the verification link in your email</span>
+        </div>
+        <div class="instruction-item">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>After verification, return to login page to sign in</span>
+        </div>
+        <div class="instruction-item">
+          <i class="fas fa-inbox"></i>
+          <span>Check your spam folder if you don't see it</span>
+        </div>
+      </div>
+
+      <div class="verification-actions">
+        <button type="button" class="btn btn-login" id="checkVerificationBtn">
+          <i class="fas fa-sync-alt"></i>
+          Check Verification Status
+        </button>
+
+        <button type="button" class="btn btn-guest" id="resendEmailBtn">
+          <i class="fas fa-redo"></i>
+          Resend Verification Email
+        </button>
+
+        <div class="footer-links" style="margin-top: 15px;">
+          <p><a href="#" id="signOutBtn"><i class="fas fa-arrow-left"></i> Sign out and go back</a></p>
+        </div>
+      </div>
+
+      <div class="auto-check-info">
+        <i class="fas fa-info-circle"></i>
+        <span>Automatically checking for verification...</span>
+      </div>
+    </div>
+
+    <!-- STEP 3: Success Area (hidden by default) -->
+    <div id="successArea" class="verification-area" style="display: none;">
+      <div class="verification-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h3>Account Created!</h3>
+      <p id="successText">Your email has been verified successfully. You can now sign in to your account.</p>
+      
+      <a href="../html/login.html" class="btn btn-login" style="text-decoration: none; margin-top: 20px;">
+        <i class="fas fa-sign-in-alt"></i>
+        Go to Login
+      </a>
+    </div>
+
+    <!-- Footer links (shown on step 1) -->
+    <div class="footer-links" id="footerLinks">
+      <p>Already have an account? <a href="../html/login.html">Sign in</a></p>
+    </div>
+  </div>
+
+  <!-- Terms and Conditions Modal -->
+  <div class="modal-overlay" id="termsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Terms and Conditions</h2>
+        <button class="modal-close" id="closeTermsBtn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p>Welcome to GATAW. By creating an account, you agree to be bound by these Terms and Conditions. Please read them carefully.</p>
+
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing or using GATAW, you confirm that you have read and understood these terms and agree to be legally bound by them.</p>
+
+        <h3>2. Account Registration</h3>
+        <p>You must provide accurate and complete information when creating your account. You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.</p>
+
+        <h3>3. Acceptable Use</h3>
+        <p>You agree not to use GATAW for any unlawful purpose, to transmit harmful or offensive content, to attempt unauthorized access to any part of the system, or to interfere with the platform's normal operation.</p>
+
+        <h3>4. Account Activation</h3>
+        <p>New accounts are subject to review and must be activated by an administrator before access is granted. We reserve the right to approve or deny account requests at our discretion.</p>
+
+        <h3>5. Termination</h3>
+        <p>We reserve the right to suspend or terminate your account at any time if you violate these terms or engage in conduct deemed harmful to other users or the platform.</p>
+
+        <h3>6. Intellectual Property</h3>
+        <p>All content, features, and functionality of GATAW are owned by GATAW and are protected by applicable intellectual property laws. You may not copy, modify, or distribute any part of the platform without prior written consent.</p>
+
+        <h3>7. Contact</h3>
+        <p>For questions about these Terms, please contact us through the platform's support channel.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="closeTermsFooterBtn">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div class="modal-overlay" id="privacyModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Privacy Policy</h2>
+        <button class="modal-close" id="closePrivacyBtn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p>Your privacy is important to us. This Privacy Policy explains how GATAW collects, uses, and protects your information.</p>
+
+        <h3>1. Information We Collect</h3>
+        <p>We collect information you provide during registration, such as your email address and password. We may also collect usage data and log information when you interact with the platform.</p>
+
+        <h3>2. How We Use Your Information</h3>
+        <p>Your information is used to create and manage your account, communicate important updates, improve the platform experience, and ensure the security of the system.</p>
+
+        <h3>3. Data Storage</h3>
+        <p>Your data is stored securely using Firebase services provided by Google. We implement appropriate technical and organizational measures to protect your personal data against unauthorized access or disclosure.</p>
+
+        <h3>4. Email Verification</h3>
+        <p>We use your email address to verify your identity during registration. Verification emails are sent through Firebase Authentication services.</p>
+
+        <h3>5. Data Sharing</h3>
+        <p>We do not sell or share your personal information with third parties, except as required by law or to provide core platform functionality (e.g., Firebase, email services).</p>
+
+        <h3>6. Cookies</h3>
+        <p>GATAW may use session cookies to maintain your authenticated state. These are essential for the platform to function and do not track you across other websites.</p>
+
+        <h3>7. Your Rights</h3>
+        <p>You have the right to access, correct, or request deletion of your personal data. To exercise these rights, please contact us through the platform's support channel.</p>
+
+        <h3>8. Contact</h3>
+        <p>If you have any questions about this Privacy Policy, please reach out through the platform's support channel.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="closePrivacyFooterBtn">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (v8 - Compat version to match your config) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
+  <!-- Your Firebase Configuration -->
+  <script src="../js/firebase.js"></script>
+  
+  <!-- Signup JavaScript -->
+  <script src="../js/signup.js"></script>
+</body>
+</html>
