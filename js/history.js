@@ -20,7 +20,7 @@ let maxDate = null;
 
 // Pagination variables
 let currentPage    = 1;
-let recordsPerPage = 500;
+let recordsPerPage = 50;
 let filteredData   = [];
 
 // ============== RENDER LOCK (prevents race condition / row stacking) ===============
